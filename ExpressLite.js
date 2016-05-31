@@ -4,24 +4,62 @@ export default class ExpressLite {
 
   constructor(){
     this.app =  http.createServer();
-    this.stack = {get: {}, post: {}};
+    this.stack = {get: {}, post:{}, put:{}, delete:{}};
   }
 
-  get(pathStr, fun){
+  get(pathStr, callback){
     let handlers = this.stack.get;
     let pathStrArray = Object.keys(handlers);
-    if(this.isRepeat(pathStr, pathStrArray))
+    if(this.isRepeat(pathStr, pathStrArray)){
+      this.stack.get[pathStr].push(callback);
       return ;
-    this.stack.get[pathStr] = fun;
+    }
+    this.stack.get[pathStr] = [callback];
+  }
+
+  post(pathStr, callback){
+    let handlers = this.stack.post;
+    let pathStrArray = Object.keys(handlers);
+    if(this.isRepeat(pathStr, pathStrArray)){
+      this.stack.post[pathStr].push(callback);
+      return;
+    }
+    this.stack.post[pathStr] = [callback];
+  }
+
+  put(pathStr, callback){
+    let handlers = this.stack.put;
+    let pathStrArray = Object.keys(handlers);
+    if(this.isRepeat(pathStr, pathStrArray)){
+      this.stack.put[pathStr].push(callback);
+      return;
+    }
+    this.stack.put[pathStr] = [callback];
+  }
+
+  delete(pathStr, callback){
+    let handlers = this.stack.delete;
+    let pathStrArray = Object.keys(handlers);
+    if(this.isRepeat(pathStr, pathStrArray)){
+      this.stack.delete[pathStr].push(callback);
+      return;
+    }
+    this.stack.delete[pathStr] = [callback];
   }
 
   listen(port, addr){
     this.app.on('request', (req, res) => {
-      let handler = this.matchHandlers(req);
-      // console.log(handler);
-      if(handler != null){
-        handler(req, res);
-      }
+      let body = [];
+      req.on('data', (chunk) => {
+        body.push(chunk);
+      }).on('end', () => {
+        body = Buffer.concat(body).toString();
+        req.body = body;
+        let handler = this.matchHandlers(req);
+        if(handler != null){
+          handler(req, res);
+        }
+      });
     });
     this.app.listen(port, addr);
   }
@@ -32,7 +70,7 @@ export default class ExpressLite {
     let pathStrArray = Object.keys(handlers);
     let matchedPath = this.matchPathStr(pathStrArray, req.url);
     if(matchedPath != null){
-      return handlers[matchedPath];
+      return handlers[matchedPath][0];
     }else{
       return null;
     }
