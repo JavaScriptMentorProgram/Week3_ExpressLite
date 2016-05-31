@@ -8,7 +8,7 @@ export default class ExpressLite {
     this.middleware = {global:[], specific: {} };
     this.middlewarePosition = 0;
   }
-
+   //app.use()
   use(...args){
     if(args.length == 1){
       this.middleware.global.push(args[0]);
@@ -21,7 +21,7 @@ export default class ExpressLite {
       this.middleware.specific[args[0]] = [args[1]];
     }
   }
-
+  //app.get()
   get(pathStr, callback){
     let handlers = this.stack.get;
     let pathStrArray = Object.keys(handlers);
@@ -31,7 +31,7 @@ export default class ExpressLite {
     }
     this.stack.get[pathStr] = [callback];
   }
-
+  //app.post()
   post(pathStr, callback){
     let handlers = this.stack.post;
     let pathStrArray = Object.keys(handlers);
@@ -41,7 +41,7 @@ export default class ExpressLite {
     }
     this.stack.post[pathStr] = [callback];
   }
-
+  //app.put()
   put(pathStr, callback){
     let handlers = this.stack.put;
     let pathStrArray = Object.keys(handlers);
@@ -51,7 +51,7 @@ export default class ExpressLite {
     }
     this.stack.put[pathStr] = [callback];
   }
-
+  //app.delete()
   delete(pathStr, callback){
     let handlers = this.stack.delete;
     let pathStrArray = Object.keys(handlers);
@@ -61,7 +61,7 @@ export default class ExpressLite {
     }
     this.stack.delete[pathStr] = [callback];
   }
-
+  //app.listen()
   listen(port, addr){
     this.app.on('request', (req, res) => {
       this.middlewareExecution(req, res);
@@ -79,7 +79,7 @@ export default class ExpressLite {
     });
     this.app.listen(port, addr);
   }
-
+  //find and execute middleware
   middlewareExecution(req, res){
     this.middlewarePosition = 0;
     //First, execute global middleware
@@ -93,7 +93,7 @@ export default class ExpressLite {
       return ;
     }
   }
-
+  //match a handler(callback) to execute
   matchHandlers(req){
     let method = req.method.toLowerCase();
     let handlers = this.stack[method];
@@ -105,7 +105,7 @@ export default class ExpressLite {
       return null;
     }
   }
-
+  //match a path string
   matchPathStr(pathStrArray, url){
     let pathElementArray = [];
     let urlElementArray = url.split('/').slice(1);
@@ -141,7 +141,7 @@ export default class ExpressLite {
     }
     return matchedPath;
   }
-
+  // wether pathStr is already exist
   isRepeat(pathStr, pathStrArray){
     let repeat = false;
     for(let i = 0; i < pathStrArray; i++){
@@ -152,7 +152,7 @@ export default class ExpressLite {
     }
     return repeat;
   }
-
+  // middleware next() function
   next(){
     this.middlewarePosition++;
   }
