@@ -10,6 +10,6 @@ npm install
 npm run server
 
 ##### How to start client
-Choice 1, use your browser
-Choice 2, use Postman
-Choice 3, ...
+Choice 1, use your browser;
+Choice 2, use Postman;
+Choice 3, ...;
