@@ -11,4 +11,4 @@ npm install
 npm run server
 
 ##### How to start client
-###### Choice 1, use your browser
+Choice 1, use your browser
