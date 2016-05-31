@@ -1,12 +1,7 @@
 ####Express function
 
-var express = require('express');
-var app = express();
+###### How to start server
+npm run server
 
-app.get('/', function(req, res){
-  res.send('hello world');
-});
-
-app.listen(3000)
-
-app.use(['/adm*n', '/manager'], admin);
+###### How to start client
+npm run client

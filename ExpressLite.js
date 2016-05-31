@@ -5,6 +5,21 @@ export default class ExpressLite {
   constructor(){
     this.app =  http.createServer();
     this.stack = {get: {}, post:{}, put:{}, delete:{}};
+    this.middleware = {global:[], specific: {} };
+    this.middlewarePosition = 0;
+  }
+
+  use(...args){
+    if(args.length == 1){
+      this.middleware.global.push(args[0]);
+    }else{
+      let pathStrArray = Object.keys(this.middleware.specific);
+      if(this.isRepeat(args[0], pathStrArray)){
+        this.middleware.specific[args[0]].push(args[1]);
+        return ;
+      }
+      this.middleware.specific[args[0]] = [args[1]];
+    }
   }
 
   get(pathStr, callback){
@@ -49,6 +64,7 @@ export default class ExpressLite {
 
   listen(port, addr){
     this.app.on('request', (req, res) => {
+      this.middlewareExecution(req, res);
       let body = [];
       req.on('data', (chunk) => {
         body.push(chunk);
@@ -62,6 +78,20 @@ export default class ExpressLite {
       });
     });
     this.app.listen(port, addr);
+  }
+
+  middlewareExecution(req, res){
+    this.middlewarePosition = 0;
+    //First, execute global middleware
+    for(let i = 0; i < this.middleware.global.length; i++){
+      if(this.middlewarePosition == i){
+        this.middleware.global[i](req, res, this.next.bind(this));
+      }
+    }
+
+    if(this.middlewarePosition == this.middleware.global.length){
+      return ;
+    }
   }
 
   matchHandlers(req){
@@ -121,5 +151,9 @@ export default class ExpressLite {
       }
     }
     return repeat;
+  }
+
+  next(){
+    this.middlewarePosition++;
   }
 }
