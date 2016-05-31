@@ -90,7 +90,24 @@ export default class ExpressLite {
     }
 
     if(this.middlewarePosition == this.middleware.global.length){
-      return ;
+      this.middlewarePosition = 0;
+      let pathStrArray = Object.keys(this.middleware.specific);
+      let pathStr = this.matchPathStr(pathStrArray, req.url);
+      if(pathStr == null){
+        return;
+      }
+
+      let specificMiddleware = this.middleware.specific[pathStr];
+      console.log(specificMiddleware);
+      for(let j = 0; j < specificMiddleware.length; j++){
+        if(this.middlewarePosition == j){
+          specificMiddleware[j](req, res, this.next.bind(this));
+        }
+      }
+
+      if(this.middlewarePosition == specificMiddleware.length){
+        return ;
+      }
     }
   }
   //match a handler(callback) to execute
@@ -144,7 +161,7 @@ export default class ExpressLite {
   // wether pathStr is already exist
   isRepeat(pathStr, pathStrArray){
     let repeat = false;
-    for(let i = 0; i < pathStrArray; i++){
+    for(let i = 0; i < pathStrArray.length; i++){
       if(pathStr == pathStrArray[i]){
         repeat = true;
         break;

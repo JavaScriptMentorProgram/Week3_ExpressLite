@@ -4,12 +4,22 @@ let app = new ExpressLite();
 
 
 app.use((req, res, next) => {
-  console.log("I am a middleware");
+  console.log('I am a middleware');
   next();
 });
 
 app.use((req, res, next) => {
-  console.log("I am another middleware");
+  console.log('I am another middleware');
+  next();
+});
+
+app.use('/home', (req, res, next) => {
+  console.log('I am a specific middleware');
+  next();
+});
+
+app.use('/home', (req, res, next) => {
+  console.log('I am another specific middleware');
 });
 
 app.get('/home', (req, res) => {
