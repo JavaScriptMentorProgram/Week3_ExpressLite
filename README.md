@@ -1,6 +1,5 @@
-####Express function
-
-
+####ExpressLite
+This project is a light Express, which implements simple use, get, post, put, delete functions
 ##### Get
 git clone https://github.com/JavaScriptMentorProgram/Week3_ExpressLite.git
 
