@@ -1,7 +1,14 @@
 ####Express function
 
-###### How to start server
+
+##### Get
+git clone https://github.com/JavaScriptMentorProgram/Week3_ExpressLite.git
+
+##### Install
+npm install
+
+##### start server
 npm run server
 
-###### How to start client
-npm run client
+##### How to start client
+###### Choice 1, use your browser
