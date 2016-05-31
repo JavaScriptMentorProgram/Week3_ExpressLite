@@ -1,19 +1,18 @@
-var express = require('ExpressLite');
-var app = express();
+import ExpressLite from './ExpressLite';
 
-app.get('/', function(req, res){
-  res.send('Hello, I am listening');
-  res.end();
+let app = new ExpressLite();
+
+app.get('/home', function(req, res){
+  res.end('Hello');
+});
+app.get('/home/users', (req, res) => {
+  res.end('I am /home/users');
 });
 
-app.get('/about', function(req, res){
-  res.send('Hello, I am about');
-  res.end();
+app.get('/users/:id', function(req, res){
+  res.end('With params');
 });
 
-app.get('/param:id', function(req, res){
-  res.send('Hello, I am with param');
-  res.end();
-});
+
 
 app.listen(8080,'localhost');

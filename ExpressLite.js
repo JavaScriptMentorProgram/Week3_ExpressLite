@@ -1,39 +1,36 @@
 var http = require('http');
-var url = require('url');
 
-class ExpressLite {
+export default class ExpressLite {
 
   constructor(){
-    this.app = null;
+    this.app =  http.createServer();
     this.stack = {get: {}, post: {}};
-  },
+  }
 
   get(pathStr, fun){
-    pathStrArray = Object.keys(handlers);
-    if(isRepeat(pathStr, pathElementArray))
+    let handlers = this.stack.get;
+    let pathStrArray = Object.keys(handlers);
+    if(this.isRepeat(pathStr, pathStrArray))
       return ;
-    this.stack.get.push({pathStr: fun});
-  },
-
+    this.stack.get[pathStr] = fun;
+  }
 
   listen(port, addr){
-    this.app = http.createServer(function(req, res){
-      let handler = matchHandlers(req);
+    this.app.on('request', (req, res) => {
+      let handler = this.matchHandlers(req);
+      // console.log(handler);
       if(handler != null){
         handler(req, res);
       }
     });
     this.app.listen(port, addr);
-    return this.app;
-  },
+  }
 
   matchHandlers(req){
-    let url = req.url;
     let method = req.method.toLowerCase();
     let handlers = this.stack[method];
-    let hanler = null;
     let pathStrArray = Object.keys(handlers);
-    let matchedPath = matchPathStr(pathStrArray, req.url);
+    let matchedPath = this.matchPathStr(pathStrArray, req.url);
     if(matchedPath != null){
       return handlers[matchedPath];
     }else{
@@ -43,7 +40,7 @@ class ExpressLite {
 
   matchPathStr(pathStrArray, url){
     let pathElementArray = [];
-    let urlElementArray = url.split('/');
+    let urlElementArray = url.split('/').slice(1);
     let matchedPath = null;
     for(let i = 0; i < pathStrArray.length; i++){
       if(pathStrArray[i] == url){
@@ -51,20 +48,22 @@ class ExpressLite {
         break;
       }
 
-      pathElementArray = pathStrArray[i].split('/');
-
-      if(pathElementArray.length != urlElementArray.length)
+      pathElementArray = pathStrArray[i].split('/').slice(1);
+      if(pathElementArray.length != urlElementArray.length){
         continue;
+      }
 
       let matched = false;
       for(let j = 0; j < pathElementArray.length; j++){
-        if(pathElementArray[j] == urlElementArray[j] || pathElementArray[j].indexOf(':') == -1)
+        if(pathElementArray[j] == urlElementArray[j] || pathElementArray[j].indexOf(':') > -1){
+          if(j == pathElementArray.length - 1){
+            matched = true;
+            break;
+          }
           continue;
-        else{
+        }else{
           break;
         }
-        if(j == pathElementArray.length -1)
-          matched = true;
       }
 
       if(matched == true){
@@ -72,7 +71,6 @@ class ExpressLite {
         break;
       }
     }
-
     return matchedPath;
   }
 
@@ -81,12 +79,9 @@ class ExpressLite {
     for(let i = 0; i < pathStrArray; i++){
       if(pathStr == pathStrArray[i]){
         repeat = true;
-        break；
+        break;
       }
     }
     return repeat;
   }
-
 }
-
-exports.express = new ExpressLite();
